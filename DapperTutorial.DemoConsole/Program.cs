@@ -27,7 +27,8 @@ namespace DapperTutorial.DemoConsole
             //ExecuteStoreProcedure(term);
 
             //BasicInsert("Leandro", "Layerle");
-            CountRowsAffected();
+            //CountRowsAffected();
+            InsertGroupOfCustomers(GetCustomers());
 
             Console.ReadKey();
         }
@@ -160,6 +161,30 @@ namespace DapperTutorial.DemoConsole
 
                 Console.Write($"Filas Afectadas por el update: {rowsAffected}");
             }
+        }
+
+        private static void InsertGroupOfCustomers(List<Customer> customers)
+        {
+            using(IDbConnection connection = new SqlConnection(ConnectionStringHelper.GetConnectionString()))
+            {
+                var sql = "INSERT INTO dbo.Customer (Name,LastName) VALUES(@Name, @LastName)";
+
+                connection.Execute(sql, customers);
+
+                BasicRead();
+            }
+        }
+
+        private static List<Customer> GetCustomers()
+        {
+            var customers = new List<Customer>();
+
+            for (int i = 0; i < 5; i++)
+            {
+                customers.Add(new Customer { Name = $"Name{i}", LastName = $"LastName{i}" });
+            }
+
+            return customers;
         }
     }
 }
