@@ -21,6 +21,11 @@ namespace DapperTutorial.DemoConsole
             //SelectOneColumn();
             //SelectByLastName("Fernandez");
             //SelectByLastNameWithAnonymousParameter("Torres");
+
+            Console.WriteLine("Ingrese un nombre o apellido a buscar");
+            var term = Console.ReadLine();
+            ExecuteStoreProcedure(term);
+
             Console.ReadKey();
         }
 
@@ -104,6 +109,25 @@ namespace DapperTutorial.DemoConsole
             }
         }
 
+        private static void ExecuteStoreProcedure(string term)
+        {
+            using (IDbConnection connection = new SqlConnection(ConnectionStringHelper.GetConnectionString()))
+            {
+                var parameter = new DynamicParameters();
+                parameter.Add("@searchTerm", term);
 
+                var sql = "dbo.SearchCustomer";
+
+                var customers = connection.Query<Customer>(sql, 
+                    parameter, 
+                    commandType: CommandType.StoredProcedure)
+                    .ToList();
+
+                customers.ForEach(customer =>
+                {
+                    Console.WriteLine($"{customer.CustomerId} {customer.Name} {customer.LastName}");
+                });
+            }
+        }
     }
 }
