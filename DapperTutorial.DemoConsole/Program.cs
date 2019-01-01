@@ -26,7 +26,8 @@ namespace DapperTutorial.DemoConsole
             //var term = Console.ReadLine();
             //ExecuteStoreProcedure(term);
 
-            BasicInsert("Leandro", "Layerle");
+            //BasicInsert("Leandro", "Layerle");
+            CountRowsAffected();
 
             Console.ReadKey();
         }
@@ -146,6 +147,18 @@ namespace DapperTutorial.DemoConsole
                 connection.Execute(sql, parameters);
 
                 SelectByLastName(lastName);
+            }
+        }
+
+        private static void CountRowsAffected()
+        {
+            using(IDbConnection connection = new SqlConnection(ConnectionStringHelper.GetConnectionString()))
+            {
+                var sql = @"UPDATE dbo.Customer SET LastName = UPPER(LastName)";
+
+                var rowsAffected = connection.Execute(sql);
+
+                Console.Write($"Filas Afectadas por el update: {rowsAffected}");
             }
         }
     }
