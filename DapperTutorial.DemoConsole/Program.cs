@@ -8,6 +8,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DapperTutorial.DemoConsole.Helpers;
 
 namespace DapperTutorial.DemoConsole
 {
@@ -21,7 +22,7 @@ namespace DapperTutorial.DemoConsole
 
         private static void BasicRead()
         {
-            using (IDbConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DapperTutorialDB"].ConnectionString))
+            using (IDbConnection connection = new SqlConnection(ConnectionStringHelper.GetConnectionString()))
             {
                 var sql = "SELECT * FROM dbo.Customer";
 
