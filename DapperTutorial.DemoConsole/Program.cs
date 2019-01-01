@@ -20,7 +20,7 @@ namespace DapperTutorial.DemoConsole
             //BasicReadWithoutModel();
             //SelectOneColumn();
             //SelectByLastName("Fernandez");
-            SelectByLastNameWithAnonymousParameter("Torres");
+            //SelectByLastNameWithAnonymousParameter("Torres");
             Console.ReadKey();
         }
 
