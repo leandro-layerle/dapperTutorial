@@ -16,7 +16,11 @@ namespace DapperTutorial.DemoConsole
     {
         static void Main(string[] args)
         {
-            BasicRead();
+            //BasicRead();
+            //BasicReadWithoutModel();
+            //SelectOneColumn();
+            //SelectByLastName("Fernandez");
+            SelectByLastNameWithAnonymousParameter("Torres");
             Console.ReadKey();
         }
 
@@ -34,5 +38,72 @@ namespace DapperTutorial.DemoConsole
                 });
             }
         }
+
+        private static void BasicReadWithoutModel()
+        {
+            using (IDbConnection connection = new SqlConnection(ConnectionStringHelper.GetConnectionString()))
+            {
+                var sql = "SELECT * FROM dbo.Customer";
+
+                var customers = connection.Query(sql).ToList();
+
+                customers.ForEach(customer =>
+                {
+                    Console.WriteLine($"{customer.Name} {customer.LastName}");
+                });
+            }
+        }
+
+        private static void SelectOneColumn()
+        {
+            using (IDbConnection connection = new SqlConnection(ConnectionStringHelper.GetConnectionString()))
+            {
+                var sql = "SELECT Name FROM dbo.Customer";
+
+                var customers = connection.Query<Customer>(sql).ToList();
+
+                customers.ForEach(customer =>
+                {
+                    Console.WriteLine($"{customer.Name} {customer.LastName}");
+                });
+            }
+        }
+
+        private static void SelectByLastName(string lastName)
+        {
+            using (IDbConnection connection = new SqlConnection(ConnectionStringHelper.GetConnectionString()))
+            {
+                var parameter = new DynamicParameters();
+                parameter.Add("@LastName", lastName);
+
+                var sql = "SELECT * FROM dbo.Customer WHERE LastName = @LastName";
+
+                var customers = connection.Query<Customer>(sql, parameter).ToList();
+
+                customers.ForEach(customer =>
+                {
+                    Console.WriteLine($"{customer.Name} {customer.LastName}");
+                });
+            }
+        }
+
+        private static void SelectByLastNameWithAnonymousParameter(string lastName)
+        {
+            using (IDbConnection connection = new SqlConnection(ConnectionStringHelper.GetConnectionString()))
+            {
+                var parameter = new { LastName = lastName };
+
+                var sql = "SELECT * FROM dbo.Customer WHERE LastName = @LastName";
+
+                var customers = connection.Query<Customer>(sql, parameter).ToList();
+
+                customers.ForEach(customer =>
+                {
+                    Console.WriteLine($"{customer.Name} {customer.LastName}");
+                });
+            }
+        }
+
+
     }
 }
