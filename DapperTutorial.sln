@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28307.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "DapperTutorialDB", "DapperTutorialDB\DapperTutorialDB.sqlproj", "{7FDF801E-3FC0-4E99-81F1-0C4C3FCC4788}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DapperTutorial.DemoConsole", "DapperTutorial.DemoConsole\DapperTutorial.DemoConsole.csproj", "{B1C12475-60F8-4F10-B459-BE6C03AC0CF0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,6 +19,10 @@ Global
 		{7FDF801E-3FC0-4E99-81F1-0C4C3FCC4788}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7FDF801E-3FC0-4E99-81F1-0C4C3FCC4788}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7FDF801E-3FC0-4E99-81F1-0C4C3FCC4788}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{B1C12475-60F8-4F10-B459-BE6C03AC0CF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1C12475-60F8-4F10-B459-BE6C03AC0CF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1C12475-60F8-4F10-B459-BE6C03AC0CF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1C12475-60F8-4F10-B459-BE6C03AC0CF0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
