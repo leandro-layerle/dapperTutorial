@@ -22,9 +22,11 @@ namespace DapperTutorial.DemoConsole
             //SelectByLastName("Fernandez");
             //SelectByLastNameWithAnonymousParameter("Torres");
 
-            Console.WriteLine("Ingrese un nombre o apellido a buscar");
-            var term = Console.ReadLine();
-            ExecuteStoreProcedure(term);
+            //Console.WriteLine("Ingrese un nombre o apellido a buscar");
+            //var term = Console.ReadLine();
+            //ExecuteStoreProcedure(term);
+
+            BasicInsert("Leandro", "Layerle");
 
             Console.ReadKey();
         }
@@ -127,6 +129,23 @@ namespace DapperTutorial.DemoConsole
                 {
                     Console.WriteLine($"{customer.CustomerId} {customer.Name} {customer.LastName}");
                 });
+            }
+        }
+
+        private static void BasicInsert(string name, string lastName)
+        {
+            using(IDbConnection connection = new SqlConnection(ConnectionStringHelper.GetConnectionString()))
+            {
+                var parameters = new DynamicParameters();
+                parameters.Add("@Name", name);
+                parameters.Add("@LastName", lastName);
+
+                var sql = @"INSERT INTO Customer (Name,LastName)
+                            VALUES (@Name, @LastName)";
+
+                connection.Execute(sql, parameters);
+
+                SelectByLastName(lastName);
             }
         }
     }
