@@ -11,5 +11,6 @@ namespace DapperTutorial.DemoConsole.Domain
         public int CustomerId { get; set; }
         public string Name { get; set; }
         public string LastName { get; set; }
+        public Address Address { get; set; }
     }
 }

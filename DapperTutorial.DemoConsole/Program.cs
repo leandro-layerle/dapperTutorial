@@ -28,7 +28,13 @@ namespace DapperTutorial.DemoConsole
 
             //BasicInsert("Leandro", "Layerle");
             //CountRowsAffected();
-            InsertGroupOfCustomers(GetCustomers());
+            //InsertGroupOfCustomers(GetCustomers());
+
+            // ----- ADVANCED --------------------------------
+            //MapTablesWithForeingKey();
+            //GetMultipleTables();
+            //GetMultipleTablesWithParameters("Fernandez", "1235");
+            GetOutputParameters("Leandro", "Layerle");
 
             Console.ReadKey();
         }
@@ -122,8 +128,8 @@ namespace DapperTutorial.DemoConsole
 
                 var sql = "dbo.SearchCustomer";
 
-                var customers = connection.Query<Customer>(sql, 
-                    parameter, 
+                var customers = connection.Query<Customer>(sql,
+                    parameter,
                     commandType: CommandType.StoredProcedure)
                     .ToList();
 
@@ -136,7 +142,7 @@ namespace DapperTutorial.DemoConsole
 
         private static void BasicInsert(string name, string lastName)
         {
-            using(IDbConnection connection = new SqlConnection(ConnectionStringHelper.GetConnectionString()))
+            using (IDbConnection connection = new SqlConnection(ConnectionStringHelper.GetConnectionString()))
             {
                 var parameters = new DynamicParameters();
                 parameters.Add("@Name", name);
@@ -153,7 +159,7 @@ namespace DapperTutorial.DemoConsole
 
         private static void CountRowsAffected()
         {
-            using(IDbConnection connection = new SqlConnection(ConnectionStringHelper.GetConnectionString()))
+            using (IDbConnection connection = new SqlConnection(ConnectionStringHelper.GetConnectionString()))
             {
                 var sql = @"UPDATE dbo.Customer SET LastName = UPPER(LastName)";
 
@@ -165,13 +171,107 @@ namespace DapperTutorial.DemoConsole
 
         private static void InsertGroupOfCustomers(List<Customer> customers)
         {
-            using(IDbConnection connection = new SqlConnection(ConnectionStringHelper.GetConnectionString()))
+            using (IDbConnection connection = new SqlConnection(ConnectionStringHelper.GetConnectionString()))
             {
                 var sql = "INSERT INTO dbo.Customer (Name,LastName) VALUES(@Name, @LastName)";
 
                 connection.Execute(sql, customers);
 
                 BasicRead();
+            }
+        }
+
+        private static void MapTablesWithForeingKey()
+        {
+            using (IDbConnection connection = new SqlConnection(ConnectionStringHelper.GetConnectionString()))
+            {
+                var sql = @"SELECT CU.*, 
+                                   AD.* 
+                            FROM dbo.Customer CU 
+                            LEFT JOIN dbo.Address AD 
+                            ON CU.AddressId = AD.AddressId";
+
+                var customers = connection.Query<Customer, Address, Customer>(sql,
+                    (customer, address) => { customer.Address = address; return customer; }, splitOn: "AddressId").ToList();
+
+                customers.ForEach(customer =>
+                {
+                    Console.WriteLine($"Name: {customer.Name} LastName: {customer.LastName} Address: {customer.Address?.Street}-{customer.Address?.Number}");
+                });
+            }
+        }
+
+        private static void GetMultipleTables()
+        {
+            using (IDbConnection connection = new SqlConnection(ConnectionStringHelper.GetConnectionString()))
+            {
+                var sql = @"SELECT * FROM Customer;
+                            SELECT * FROM Address;";
+
+                var customers = new List<Customer>();
+                var addresses = new List<Address>();
+
+                using (var lists = connection.QueryMultiple(sql))
+                {
+                    customers = lists.Read<Customer>().ToList();
+                    addresses = lists.Read<Address>().ToList();
+                }
+
+                Console.WriteLine("---CLIENTES---");
+                customers.ForEach(customer => { Console.WriteLine($"{customer.Name} {customer.LastName}"); });
+                Console.WriteLine();
+                Console.WriteLine("---DOMICILIO---");
+                addresses.ForEach(address => { Console.WriteLine($"{address.Street} {address.Number}"); });
+            }
+        }
+
+        private static void GetMultipleTablesWithParameters(string lastName, string addressTerm)
+        {
+            using (IDbConnection connection = new SqlConnection(ConnectionStringHelper.GetConnectionString()))
+            {
+                var sql = @"SELECT * FROM Customer WHERE LastName = @LastName;
+                            SELECT * FROM Address WHERE Street LIKE '%' + @address + '%'
+                                                  OR Number LIKE '%' + @address + '%';";
+
+                var parameters = new { LastName = lastName, Address = addressTerm
+ };
+
+                var customers = new List<Customer>();
+                var addresses = new List<Address>();
+
+                using (var lists = connection.QueryMultiple(sql, parameters))
+                {
+                    customers = lists.Read<Customer>().ToList();
+                    addresses = lists.Read<Address>().ToList();
+                }
+
+                Console.WriteLine("---CLIENTES---");
+                customers.ForEach(customer => { Console.WriteLine($"{customer.Name} {customer.LastName}"); });
+                Console.WriteLine();
+                Console.WriteLine("---DOMICILIO---");
+                addresses.ForEach(address => { Console.WriteLine($"{address.Street} {address.Number}"); });
+            }
+
+        }
+
+        private static void GetOutputParameters(string name, string lastName)
+        {
+            using (IDbConnection connection = new SqlConnection(ConnectionStringHelper.GetConnectionString()))
+            {
+                var parameters = new DynamicParameters();
+                parameters.Add("@Id", 0, DbType.Int32, ParameterDirection.Output);
+                parameters.Add("@Name", name);
+                parameters.Add("@LastName", lastName);
+
+                var sql = @"INSERT INTO dbo.Customer (Name, LastName)
+                            VALUES (@Name, @LastName)
+                            SELECT @Id = @@IDENTITY";
+
+                connection.Execute(sql, parameters);
+
+                var identity = parameters.Get<int>("@Id");
+
+                Console.WriteLine($"El nuevo id de Cliente es: {identity}");
             }
         }
 
